@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+    <meta charset="UTF-8">
+    <title>画像判定アプリ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    </head>
+<body>
+    <div class="container py-5 text-center">
+    <h2 class="mb-4">画像判定します。</h2>
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+        {% csrf_token %}
+        {{ form.as_p }}
+        </div>
+        <input id="img_data" type="hidden" name="img_data" />
+        <img id="preview" style="display: none;" class="img-fluid mb-3" />
+        <button type="submit" class="btn btn-primary btn-lg">判定</button>
+    </form>
+
+    {% if results %}
+        <div id="result">
+        <hr>
+        <h2 class="mb-4">判定結果</h2>
+        <p>あなたのアップロードした画像の判定結果は以下の通りです。</p>
+        <img src="{{ img_data }}" class="img-fluid mb-3">
+        <table class="table table-striped table-hover text-center">
+            <thead>
+                <tr>
+                    <th>カテゴリ</th>
+                    <th>確率</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ result.class }}</td>
+                    <td>{{ result.probability }} </td>
+                </tr>
+                {% endfor %}
+            </tbody>        
+        </table>
+    </div>
+    {% endif %}
+
+</div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(function(){
+            $('#id_image').on('change', function(){
+            var reader = new FileReader();
+            reader.onload = function () {
+                $("#preview").attr('src', reader.result);
+                $("#preview").show();
+                $("#img_data").val(reader.result);
+            }
+            reader.readAsDataURL(this.files[0]);
+            $("#result").text('');
+            });
+        });
+    </script>
+</body>
+</html>
